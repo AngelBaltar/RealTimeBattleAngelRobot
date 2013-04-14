@@ -49,7 +49,6 @@ void action_game_start(robot_info * info)
 }
 void action_info(robot_info * info)
 {
-
 	rotate_to(ROTATE_CANNON+ROTATE_RADAR,1.0,0.0);
 }
 void action_radar(robot_info * info)
@@ -59,7 +58,7 @@ void action_radar(robot_info * info)
 	static enemy_found=0;
 	static last_object=0;
 	double rnd;
-	if(info->robots_left>20){
+	if(info->robots_left>17){
 		rotate(ROTATE_ROBOT,2*PI);
 		accelerate(info->maxspeed);
 		if(info->object_find==ROBOT)
@@ -70,11 +69,11 @@ void action_radar(robot_info * info)
 	{
 	case MINE:{shoot(info->shotminenergy);break;}
 	  case ROBOT:{//lets hit that guy
-		  	  	  	  brake(1.0);
-		  	  	  	  if((info->energy)>5){
+		  	  	  	  brake(0.8);
+		  	  	  	  if(info->dist_to_object<40){
 						  shot_energy=(info->shotmaxenergy)*(info->energy/info->robotmaxenergy)/
 								info->speed*info->dist_to_object*info->dist_to_object;
-						  rotate(ROTATE_ALL,0);
+						 // rotate(ROTATE_ALL,0);
 						  rnd=(rand()/RAND_MAX)*(2*PI);
 						  shoot(shot_energy);
 						  if(info->dist_to_object<12){
@@ -86,7 +85,7 @@ void action_radar(robot_info * info)
 						  }
 						  i=0;
 						  while(i++<count_shot){
-							  rotate_to(ROTATE_CANNON,info->robotmaxrotate,info->object_angle+rnd);
+							  rotate_amount(ROTATE_CANNON,info->cannonmaxrotate,info->object_angle+rnd);
 							  rnd*=-1;
 							  shoot(shot_energy);
 						  }
@@ -103,7 +102,7 @@ void action_radar(robot_info * info)
 			  info->enemy_found--;
 			  break;
 		  }
-		  if(info->dist_to_object<15){
+		  if(info->dist_to_object<10){
 			  brake(1.0);
 			  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/2.0);
 			  accelerate(info->maxspeed);
@@ -126,11 +125,18 @@ void action_radar(robot_info * info)
 			  }
 	  case COOKIE:{//get it
 		  	  	  //rotate(ROTATE_ALL,0.0);//stop
-		  	  	  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
-		  	  	  if(info->dist_to_object>5)
-		  	  		  accelerate(info->maxspeed);
-		  	  	  else
-		  	  		  accelerate(info->maxspeed/1.2);
+		  	  	  if(info->object_find!=last_object){
+					  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
+					  if(info->dist_to_object>5)
+						  accelerate(info->maxspeed);
+					  else
+						  accelerate(info->maxspeed/1.2);
+
+		  	  	  }
+		  	  	  else{
+		  	  		 if(info->dist_to_object<=5)
+		  	  			 accelerate(info->maxspeed/1.2);
+		  	  	  }
 		  	  	  break;
 	  }
 
@@ -171,6 +177,7 @@ void action_collision(robot_info * info)
 		  case SHOT:{
 			  	  	  info->enemy_found-=3;
 			  		  accelerate(info->maxspeed);
+			  		  rotate(ROTATE_ALL,0);
 			  		  if(rnd>0.5)
 							direction=1;
 					  else
@@ -206,7 +213,15 @@ void action_collision(robot_info * info)
 		}
 }
 
-
+void action_initialize(robot_info * info)
+{
+	if(info->int_msg_value==1)//first round
+	{
+		debug("initializingggg!!!!!!!");
+		name("Angel");
+		colour("ff0433","aaffaa");
+	}
+}
 
 
 
@@ -221,13 +236,14 @@ int main(int argc, char * argv[])
   set_message_action(RADAR,action_radar);
   set_message_action(GAME_STARTS,action_game_start);
   set_message_action(INFO,action_info);
+  set_message_action(INITIALIZE,action_initialize);
 
   set_work_info(&info);
   basic_initialize(&info);
+  //name("Angel");
+  //		colour("ff0433","aaffaa");
 
   signal(SIGUSR1, &read_robot);
-  name("Angel");
-  colour("ff0033","aaffaa");
   srand(time(NULL));
 
   info.object_find=-1;

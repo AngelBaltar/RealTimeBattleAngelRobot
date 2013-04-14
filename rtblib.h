@@ -257,6 +257,9 @@ typedef struct
 	shotenergyincreasespeed
 	,timeout;
 
+	int int_msg_value;
+	double dou_msg_value;
+
 	unsigned char exit_robot;
 
 }robot_info;

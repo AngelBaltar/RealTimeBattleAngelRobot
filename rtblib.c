@@ -100,10 +100,10 @@ void read_robot(int sig)
    while(err!=EOF){
 	   snprintf(aux,255,"action for msg: %i\n",msg);
 	   debug(aux);
-	   if((msg>0)&&(msg<NUM_MESSAGES_TO_ROBOT)){
-		   actions[msg](work_info);
-	   }
 		   switch(msg){
+		   case INITIALIZE:{
+			   	   	   err=scanf("%i\n",&work_info->int_msg_value);
+			   	   	   break;}
 			   case INFO:
 						err=scanf("%le\n%le\%le\n",&tid,&work_info->speed,&cannon_angle);
 						break;
@@ -152,6 +152,8 @@ void read_robot(int sig)
 								  }
 			  case GAME_STARTS:{
 			            break;}
+			  case WARNING:{Print("ups i get a warning\n");break;}
+			  case DEAD:{Print("im dead but i can kill someone form the other side\n");break;}
 			  case GAME_OPTION:{
 						int optnr;
 						double value;
@@ -205,6 +207,9 @@ void read_robot(int sig)
 							 //debug(buff);
 							 break;
 						  }
+		   }
+		   if((msg>=0)&&(msg<NUM_MESSAGES_TO_ROBOT)){
+			   actions[msg](work_info);
 		   }
 		   snprintf(buff,255,"");
 		   err=scanf("%s\n",buff);
