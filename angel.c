@@ -67,59 +67,42 @@ void action_radar(robot_info * info)
 	}
 	switch(info->object_find)
 	{
-	case MINE:{shoot(info->shotminenergy);break;}
+	case MINE:{rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/4);break;}
 	  case ROBOT:{//lets hit that guy
-		  	  	  	  brake(0.8);
-		  	  	  	  if(info->dist_to_object<40){
+		  	  	  	  brake(0.4);
+		  	  	  	  if(info->energy<15)
+		  	  	  		  break;
+		  	  	  	  rotate(ROTATE_ALL,0);
+		  	  	  	  if(info->dist_to_object<30){
 						  shot_energy=(info->shotmaxenergy)*(info->energy/info->robotmaxenergy)/
-								info->speed*info->dist_to_object*info->dist_to_object;
-						 // rotate(ROTATE_ALL,0);
+								info->speed+info->dist_to_object*info->dist_to_object;
 						  rnd=(rand()/RAND_MAX)*(2*PI);
 						  shoot(shot_energy);
-						  if(info->dist_to_object<12){
-							  count_shot=20;
+						  if(info->dist_to_object<6){
+							  count_shot=10;
+							  i=0;
+							  while(i++<count_shot){
+								  //rotate_amount(ROTATE_CANNON,info->cannonmaxrotate,info->object_angle+rnd);
+								  rnd*=-1;
+								  shoot(shot_energy);
+							  }
 							  Print("Die coward!\n");
 						  }
-						  else{
-							  count_shot=((rand()/RAND_MAX)*10)/info->dist_to_object;
-						  }
-						  i=0;
-						  while(i++<count_shot){
-							  rotate_amount(ROTATE_CANNON,info->cannonmaxrotate,info->object_angle+rnd);
-							  rnd*=-1;
-							  shoot(shot_energy);
-						  }
-						  if(info->enemy_found<2){
-							  sweep(ROTATE_CANNON+ROTATE_RADAR,PI/2.0,PI/2.0,-PI/2.0);
-							  debug("set sweep!\n");
-						  }
-						  info->enemy_found+=2;
 						  break;
 		  	  	  	  }
 				  }
 	  case SHOT:{//lets avoid THAT.
-		  if(info->enemy_found>2){
-			  info->enemy_found--;
-			  break;
-		  }
-		  if(info->dist_to_object<10){
-			  brake(1.0);
-			  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/2.0);
-			  accelerate(info->maxspeed);
-		  }
+		 // shoot(info->shotminenergy);
 		  break;
 	  }
 	  case WALL:{//lets avoid THAT
 		  	  	  	  brake(1/info->dist_to_object);
-		  	  	  	  if(info->enemy_found>2){
-		  	  	  		  info->enemy_found--;
-		  	  	  		  break;
-		  	  	  	  }
-		  	  	  	  rnd=info->speed*5;
+		  	  	  	  rnd=info->speed*10;
 					  if(info->dist_to_object<rnd){
 						  brake(1.0);
 						  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/2.0);
-						  accelerate(info->maxspeed/2);
+						  accelerate(info->maxspeed);
+						  rotate(ROTATE_RADAR+ROTATE_CANNON,0.1);
 					  }
 				  break;
 			  }
@@ -148,65 +131,50 @@ void action_collision(robot_info * info)
 {
 	//debug("collision!!");
 	double acceleration,robot_rotate,radar_angle,sweepleft,sweepright,shot_energy;
-	info->enemy_found=0;
 	int i,count_shot;
 	double rnd;
-	int direction;
 	switch(info->object_find)
 		{
 	case ROBOT:{//lets hit that guy
 					  brake(1.0);
 					  shot_energy=(info->shotmaxenergy)*(info->energy/info->robotmaxenergy)/4*info->dist_to_object;
-					  shoot(shot_energy);
-					  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
-					  if(info->dist_to_object<12){
-						  count_shot=20;
-						  Print("Die coward!\n");
-					  }
-					  else{
-						  count_shot=((rand()/RAND_MAX)*5)/info->dist_to_object;
-					  }
-					  i=0;
-					  while(i++<count_shot){
-						  shoot(shot_energy);
-					  }
-					  info->enemy_found+=2;
 
-						  break;
+					  if(info->dist_to_object<50){
+						  shoot(shot_energy);
+						  //rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
+						  if(info->dist_to_object<10){
+							  count_shot=20;
+							  i=0;
+							  while(i++<count_shot){
+								  shoot(shot_energy);
+							  }
+							  Print("Die coward!\n");
 						  }
+						  else{
+							  count_shot=((rand()/RAND_MAX)*5)/info->dist_to_object;
+						  }
+					  }
+
+
+					break;
+				 }
 		  case SHOT:{
-			  	  	  info->enemy_found-=3;
+			  	  	  if(info->speed<1.0){
 			  		  accelerate(info->maxspeed);
+			  	  	  }
 			  		  rotate(ROTATE_ALL,0);
-			  		  if(rnd>0.5)
-							direction=1;
-					  else
-							direction=-1;
 					  rnd=rnd=(rand()/RAND_MAX)*2*PI;
-					  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rnd*direction);
+					  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rnd);
 			  	  	  break;}
 		  case WALL:{//lets avoid THAT
-			  	  	  rnd=rand()/RAND_MAX;
-			  	  	  if(info->enemy_found>2){
-						  info->enemy_found--;
-						  break;
-					  }
-			  	  	if(rnd>0.5)
-			  	  		direction=1;
-			  	  	else
-			  	  		direction=-1;
 			  	  	rnd=rnd=(rand()/RAND_MAX)*2*PI;
-			  	  	rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rnd*direction);
-					accelerate(-info->maxspeed);
+			  	  	rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rnd);
+					accelerate(info->maxspeed);
 					break;
 				  }
 
 		  case COOKIE:{//get it
 			  	  	  Print("It was delicious!\n");
-			  	  	  if(info->enemy_found>2){
-						  info->enemy_found--;
-						  break;
-					  }
 			  	  	  info->energy+=10;
 			  	  	  break;
 		  }
@@ -224,6 +192,10 @@ void action_initialize(robot_info * info)
 }
 
 
+void action_rotation_reach(robot_info * info)
+{
+	//shoot(info->shotminenergy);
+}
 
 int main(int argc, char * argv[])
 {
@@ -237,17 +209,16 @@ int main(int argc, char * argv[])
   set_message_action(GAME_STARTS,action_game_start);
   set_message_action(INFO,action_info);
   set_message_action(INITIALIZE,action_initialize);
+  set_message_action(ROTATION_REACHED,action_rotation_reach);
 
   set_work_info(&info);
   basic_initialize(&info);
-  //name("Angel");
-  //		colour("ff0433","aaffaa");
-
   signal(SIGUSR1, &read_robot);
+
+
   srand(time(NULL));
 
   info.object_find=-1;
-  info.enemy_found=0;
   for( ;!info.exit_robot ;sleep(1));
   return(EXIT_SUCCESS);
 }

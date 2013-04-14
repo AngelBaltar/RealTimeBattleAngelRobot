@@ -237,12 +237,11 @@ typedef struct
 	double angle_pos;
 	double cannon_angle_pos;
 
-	int enemy_found;
 	double enemy_energy;
 
 	int robots_left;
 
-	double maxspeed,
+	double maxspeed,minspeed,
 		  robotmaxrotate,
 		  cannonmaxrotate,
 		  radarmaxrotate,
@@ -254,8 +253,10 @@ typedef struct
 			shotspeed,
 			shotmaxenergy,
 			shotminenergy,
-	shotenergyincreasespeed
-	,timeout;
+	shotenergyincreasespeed,
+	shootpenalty,
+	timeout,
+	maxenergy;
 
 	int int_msg_value;
 	double dou_msg_value;

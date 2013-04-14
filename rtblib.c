@@ -38,13 +38,18 @@ static robot_info  *work_info=0;
  */
 void basic_initialize(robot_info * data_to_work)
 {
-	data_to_work->maxspeed=3.0;
+	data_to_work->maxspeed=2.0;
+	data_to_work->minspeed=-0.5;
 	data_to_work->energy=100;
-	data_to_work->radarmaxrotate=2*PI;
+	data_to_work->maxenergy=120;
+	data_to_work->robotmaxrotate=0.785398;
+	data_to_work->radarmaxrotate=2.0944;
 	data_to_work->exit_robot=0;
-	data_to_work->radarmaxrotate=2*PI;
-	data_to_work->shotmaxenergy=3;
-	data_to_work->shotminenergy=1;
+	data_to_work->cannonmaxrotate=1.5708;
+	data_to_work->shotmaxenergy=30;
+	data_to_work->shotminenergy=0.5;
+	data_to_work->shotspeed=10;
+	data_to_work->shootpenalty=0.075;
 }
 
 /**
