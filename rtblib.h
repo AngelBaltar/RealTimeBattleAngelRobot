@@ -18,8 +18,18 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
 */
 
-#ifndef __MESSAGETYPES__
-#define __MESSAGETYPES__
+#ifndef __RTBLIB__
+#define __RTBLIB__
+
+#include <stdio.h>
+
+
+#define ROTATE_ROBOT	1
+#define	ROTATE_CANNON	2
+#define ROTATE_RADAR	4
+#define ROTATE_ALL		7
+#define PI	 3.14159265358 //979323846264338327950288419716939937510
+
 
 enum message_to_robot_type 
 {
@@ -46,6 +56,8 @@ enum message_to_robot_type
   //  SAVE_DATA,
   EXIT_ROBOT
 };
+
+#define NUM_MESSAGES_TO_ROBOT 17
 
 enum message_from_robot_type 
 {
@@ -209,5 +221,125 @@ static const struct Message message_from_robot[25] =
   //  {"SaveDataFinished",0, {}},
   {"",             0, {}}
 };
+
+typedef struct
+{
+
+	double speed;
+	double energy;
+
+	int object_find;
+	double dist_to_object;
+	double object_angle;
+
+	double x_pos;
+	double y_pos;
+	double angle_pos;
+	double cannon_angle_pos;
+
+	int enemy_found;
+	double enemy_energy;
+
+	int robots_left;
+
+	double maxspeed,
+		  robotmaxrotate,
+		  cannonmaxrotate,
+		  radarmaxrotate,
+		  dist,
+		  prev_dist;
+	double robotstartenergy,
+			robotmaxenergy,
+			robotenergylevels,
+			shotspeed,
+			shotmaxenergy,
+			shotminenergy,
+	shotenergyincreasespeed
+	,timeout;
+
+	unsigned char exit_robot;
+
+}robot_info;
+
+typedef  void (type_action)(robot_info *);
+
+static inline void debug(const char * msg)
+{
+	printf("Debug %s\n",msg);
+	fflush(stdout);
+}
+
+static inline void Print(const char * msg)
+{
+	printf("Print %s\n",msg);
+	fflush(stdout);
+}
+
+static inline void robot_option(int option,int value)
+{
+	printf("RobotOption %i %i\n",option,value);
+	fflush(stdout);
+}
+
+static inline void colour(const char* color1,const char* color2)
+{
+	printf("Colour %s %s\n",color1,color2);
+	fflush(stdout);
+}
+
+static inline void name(const char* name)
+{
+	printf("Name %s\n",name);
+	fflush(stdout);
+}
+
+static inline void accelerate(const double accel)
+{
+	printf("Accelerate %le\n",accel);
+	fflush(stdout);
+}
+
+static inline void rotate(const int what,const double angular_speed)
+{
+	printf("Rotate %i %le\n",what,angular_speed);
+	fflush(stdout);
+}
+
+static inline void shoot(const double shoot_energy)
+{
+	printf("Shoot %le\n",shoot_energy);
+	fflush(stdout);
+}
+
+static inline void rotate_to(const int what,const double angular_speed,const double end_angle)
+{
+	printf("RotateTo %i %le %le\n",what,angular_speed,end_angle);
+	fflush(stdout);
+}
+
+static inline void sweep(const int what,const double angular_speed,const double left,const double right)
+{
+	printf("Sweep %i %le %le %le\n",what,angular_speed,left,right);
+	fflush(stdout);
+}
+
+static inline void rotate_amount(const int what,const double angular_speed,const double angle)
+{
+	printf("RotateAmount %i %le %le\n",what,angular_speed,angle);
+	fflush(stdout);
+}
+
+static inline void brake(const double portion)
+{
+	printf("Brake %le\n",portion);
+	fflush(stdout);
+}
+
+enum message_to_robot_type name2msg_to_robot_type(char* msg_name);
+void read_robot(int sig);
+void set_work_info(robot_info * data_to_work);
+void set_message_action(enum message_to_robot_type code, type_action *action);
+void basic_initialize(robot_info * data_to_work);
+
 
 #endif 

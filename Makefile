@@ -5,7 +5,7 @@
 
 
 all: 
-	gcc angel.c -O2 -lm -o angel.robot
+	gcc rtblib.c angel.c -O2 -lm -o angel.robot
         
 clean:
 	rm -f *.robot
