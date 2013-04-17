@@ -53,10 +53,15 @@ void action_info(robot_info * info)
 }
 void action_radar(robot_info * info)
 {
+	#define NOTHING	0
+	#define GET_COOKIE	1
+
+
 	int i,count_shot;
 	double acceleration,robot_rotate,radar_angle,sweepleft,sweepright,shot_energy;
-	static enemy_found=0;
-	static last_object=0;
+	static unsigned char enemy_found=0;
+	static unsigned char last_object=0;
+	static unsigned char doing=NOTHING;
 	double rnd;
 	if(info->robots_left>17){
 		rotate(ROTATE_ROBOT,2*PI);
@@ -73,12 +78,11 @@ void action_radar(robot_info * info)
 				}
 				rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/4);break;}
 	  case ROBOT:{//lets hit that guy
-		  	  	  	  brake(0.3);
-		  	  	  	  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
+		  	  	  	  brake(0.4);
 		  	  	  	  if(info->energy<15)
 		  	  	  		  break;
 		  	  	  	  rotate(ROTATE_ALL,0);
-		  	  	  	  if(info->dist_to_object<7){
+		  	  	  	  if(info->dist_to_object<12){
 						  shot_energy=(info->shotmaxenergy)*(info->energy/info->robotmaxenergy)/
 								info->speed+info->dist_to_object;
 						  rnd=(rand()/RAND_MAX)*(2*PI);
@@ -95,6 +99,7 @@ void action_radar(robot_info * info)
 						  }
 						  break;
 		  	  	  	  }
+		  	  	  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
 				  }
 	  case SHOT:{//lets avoid THAT.
 		 // shoot(info->shotminenergy);
@@ -102,7 +107,7 @@ void action_radar(robot_info * info)
 	  }
 	  case WALL:{//lets avoid THAT
 		  	  	  	  brake(1/info->dist_to_object);
-		  	  	  	  rnd=info->speed*16;
+		  	  	  	  rnd=info->speed*20;
 					  if(info->dist_to_object<rnd){
 						  brake(1.0);
 						  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/2.0);
@@ -120,10 +125,13 @@ void action_radar(robot_info * info)
 		  	  	  }
 		  	  	  else
 		  	  	  {
-		  	  		 if(info->dist_to_object>5)
-						  accelerate(info->maxspeed);
-					  else
-						  accelerate(info->maxspeed/1.2);
+		  	  		  if(doing!=GET_COOKIE){
+		  	  			  doing=GET_COOKIE;
+						 if(info->dist_to_object>5)
+							  accelerate(info->maxspeed);
+						  else
+							  accelerate(info->maxspeed/1.2);
+						  }
 		  	  	  }
 		  	  	  break;
 	  }
