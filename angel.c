@@ -62,6 +62,8 @@ void action_radar(robot_info * info)
 	static unsigned char enemy_found=0;
 	static unsigned char last_object=0;
 	static unsigned char doing=NOTHING;
+	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
+
 	double rnd;
 	if(info->robots_left>17){
 		rotate(ROTATE_ROBOT,2*PI);
@@ -76,12 +78,14 @@ void action_radar(robot_info * info)
 				if(info->dist_to_object<7){
 					shoot(info->shotminenergy);
 				}
-				rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/4);break;}
+				rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/4);
+				break;
+		}
 	  case ROBOT:{//lets hit that guy
-		  	  	  	  brake(0.4);
+		  	  	  	  brake(0.8);
+		  	  	  	  rotate(ROTATE_ALL,0);
 		  	  	  	  if(info->energy<15)
 		  	  	  		  break;
-		  	  	  	  rotate(ROTATE_ALL,0);
 		  	  	  	  if(info->dist_to_object<12){
 						  shot_energy=(info->shotmaxenergy)*(info->energy/info->robotmaxenergy)/
 								info->speed+info->dist_to_object;
@@ -100,22 +104,29 @@ void action_radar(robot_info * info)
 						  break;
 		  	  	  	  }
 		  	  	  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
+		  	  	  rotate_to(ROTATE_CANNON+ROTATE_RADAR,info->cannonmaxrotate,info->object_angle+rand()*dir);
+		  	  	  rnd=40;
+				  if(info->dist_to_object<rnd)
+					  brake(10/info->dist_to_object);
+				  else
+					  accelerate(info->maxspeed);
+		  	  	  break;
 				  }
-	  case SHOT:{//lets avoid THAT.
-		 // shoot(info->shotminenergy);
-		  break;
-	  }
 	  case WALL:{//lets avoid THAT
-		  	  	  	  brake(1/info->dist_to_object);
-		  	  	  	  rnd=info->speed*20;
+
+					  rnd=40;
 					  if(info->dist_to_object<rnd){
-						  brake(1.0);
-						  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/2.0);
+						  brake(10/info->dist_to_object);
+						  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,2*PI*rand()*dir);
 						  accelerate(info->maxspeed);
 						  rotate(ROTATE_RADAR+ROTATE_CANNON,0.1);
 					  }
 				  break;
-			  }
+	 			 }
+	  case SHOT:{//lets avoid THAT.
+		  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle+rand());
+		  break;
+	  }
 	  case COOKIE:{//get it
 		  	  	  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
 		  	  	  if((info->dist_to_object>40)&&(info->robots_left>6)){
