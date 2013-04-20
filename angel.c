@@ -78,7 +78,7 @@ void action_radar(robot_info * info)
 				if(info->dist_to_object<7){
 					shoot(info->shotminenergy);
 				}
-				rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/4);
+				rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,(PI/2)*dir);
 				break;
 		}
 	  case ROBOT:{//lets hit that guy
@@ -124,7 +124,8 @@ void action_radar(robot_info * info)
 				  break;
 	 			 }
 	  case SHOT:{//lets avoid THAT.
-		  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle+rand());
+		  if((info->dist_to_object<20)&&(info->dist_to_object<10))
+			  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rand()*2*PI*dir);
 		  break;
 	  }
 	  case COOKIE:{//get it
@@ -157,30 +158,39 @@ void action_collision(robot_info * info)
 	double acceleration,robot_rotate,radar_angle,sweepleft,sweepright,shot_energy;
 	int i,count_shot;
 	double rnd;
+	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
 	switch(info->object_find)
 		{
 	case ROBOT:{//lets hit that guy
-					  brake(1.0);
-					  shot_energy=(info->shotmaxenergy)*(info->energy/info->robotmaxenergy)/4*info->dist_to_object;
-
-					  if(info->dist_to_object<50){
-						  shoot(shot_energy);
-						  //rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
-						  if(info->dist_to_object<10){
-							  count_shot=20;
-							  i=0;
-							  while(i++<count_shot){
-								  shoot(shot_energy);
-							  }
-							  Print("Die coward!\n");
+		 	 	  brake(0.8);
+				  rotate(ROTATE_ALL,0);
+				  if(info->energy<15)
+					  break;
+				  if(info->dist_to_object<12){
+					  shot_energy=(info->shotmaxenergy)*(info->energy/info->robotmaxenergy)/
+							info->speed+info->dist_to_object;
+					  rnd=(rand()/RAND_MAX)*(2*PI);
+					  shoot(shot_energy);
+					  if(info->dist_to_object<6){
+						  count_shot=10;
+						  i=0;
+						  while(i++<count_shot){
+							  //rotate_amount(ROTATE_CANNON,info->cannonmaxrotate,info->object_angle+rnd);
+							  rnd*=-1;
+							  shoot(shot_energy);
 						  }
-						  else{
-							  count_shot=((rand()/RAND_MAX)*5)/info->dist_to_object;
-						  }
+						  Print("Die coward!\n");
 					  }
-
-
-					break;
+					  break;
+				  }
+			  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
+			  rotate_to(ROTATE_CANNON+ROTATE_RADAR,info->cannonmaxrotate,info->object_angle+rand()*dir);
+			  rnd=40;
+			  if(info->dist_to_object<rnd)
+				  brake(10/info->dist_to_object);
+			  else
+				  accelerate(info->maxspeed);
+			  break;
 				 }
 		  case SHOT:{
 			  	  	  if(info->speed<1.0){
