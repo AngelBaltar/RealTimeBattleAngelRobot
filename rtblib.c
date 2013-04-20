@@ -61,11 +61,23 @@ void set_work_info(robot_info * data_to_work)
 }
 
 /**
- * sets the default action to do when message_to_robot_type
+ * sets the default action to do when message_to_robot_type code is received
  */
 void set_message_action(enum message_to_robot_type code, type_action *action)
 {
 	actions[code]=action;
+}
+
+/**
+ * sets the strategy strategy_actions, the strategy defines an action to do for any message that can be
+ * received
+ */
+void set_strategy(type_action ** strategy_actions)
+{
+	unsigned i;
+	for(i=0;i<NUM_MESSAGES_TO_ROBOT;i++){
+		actions[i]=strategy_actions[i];
+	}
 }
 
 /**

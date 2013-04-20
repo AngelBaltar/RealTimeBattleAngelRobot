@@ -267,6 +267,7 @@ typedef struct
 
 typedef  void (type_action)(robot_info *);
 
+
 static inline void debug(const char * msg)
 {
 	printf("Debug %s\n",msg);
@@ -343,6 +344,7 @@ enum message_to_robot_type name2msg_to_robot_type(char* msg_name);
 void read_robot(int sig);
 void set_work_info(robot_info * data_to_work);
 void set_message_action(enum message_to_robot_type code, type_action *action);
+void set_strategy(type_action ** strategy_actions);
 void basic_initialize(robot_info * data_to_work);
 
 
