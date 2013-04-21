@@ -3,6 +3,7 @@
 
 #include "rtblib.h"
 #include "search_destroy_strategy/search_destroy_strategy.h"
+#include "hide_escape_strategy/hide_escape_strategy.h"
 
 
 /*void print_robot_state(void)
@@ -34,13 +35,21 @@ int main(int argc, char * argv[])
   robot_option(SIGNAL,SIGUSR1);
   robot_option(SEND_ROTATION_REACHED,1);
 
-  set_strategy(get_search_destroy_strategy());
 
   set_work_info(&info);
   basic_initialize(&info);
   signal(SIGUSR1, &read_robot);
 
   info.object_find=-1;
-  for( ;!info.exit_robot ;sleep(1));
+  for( ;!info.exit_robot ;sleep(1)){
+	  if(info.robots_left>4){
+		  set_strategy(get_hide_escape_strategy());
+	  }
+	  else{
+		  set_strategy(get_search_destroy_strategy());
+	  }
+
+
+  }
   return(EXIT_SUCCESS);
 }

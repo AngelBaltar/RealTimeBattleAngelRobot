@@ -17,6 +17,10 @@ void search_destroy_do_nothing(robot_info * info){
 	return;
 }
 
+/**
+ * starts this strategy
+ * @param info the information about the robot
+ */
 void search_destroy_do_game_starts(robot_info * info)
 {
 	Print("Get ready to die guys!\n");
@@ -24,10 +28,20 @@ void search_destroy_do_game_starts(robot_info * info)
 	accelerate(info->maxspeed);
 	srand(time(NULL));
 }
+
+/**
+ * action about the message info
+ * @param info the information about the robot
+ */
 void search_destroy_do_info(robot_info * info)
 {
 	rotate_to(ROTATE_CANNON+ROTATE_RADAR,1.0,0.0);
 }
+
+/**
+ * action to do when radar event received
+ * @param info the information about the robot
+ */
 void search_destroy_do_radar(robot_info * info)
 {
 	#define NOTHING	0
@@ -129,6 +143,10 @@ void search_destroy_do_radar(robot_info * info)
 	last_object=info->object_find;
 }
 
+/**
+ * action to do when a collision message is received
+ * @param info the information about the robot
+ */
 void search_destroy_do_collision(robot_info * info)
 {
 	//debug("collision!!");
@@ -192,6 +210,10 @@ void search_destroy_do_collision(robot_info * info)
 		}
 }
 
+/**
+ * handles the initialize message
+ * @param info the information about the robot
+ */
 void search_destroy_do_initialize(robot_info * info)
 {
 	if(info->int_msg_value==1)//first round
@@ -202,7 +224,10 @@ void search_destroy_do_initialize(robot_info * info)
 	}
 }
 
-
+/**
+ * handles rotation reached message
+ * @param info the information about the robot
+ */
 void search_destroy_do_rotation_reached(robot_info * info)
 {
 	//shoot(info->shotminenergy);

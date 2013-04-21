@@ -5,6 +5,7 @@
 
 C_FILES= rtblib.c \
 		search_destroy_strategy/search_destroy_strategy.c \
+		hide_escape_strategy/hide_escape_strategy.c \
 		angel.c 
 all: 
 	gcc -I ./Include $(C_FILES) -O2 -lm -o angel.robot
