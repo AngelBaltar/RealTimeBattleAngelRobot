@@ -46,24 +46,27 @@ void hide_escape_do_radar(robot_info * info)
 {
 	#define NOTHING	0
 	#define GET_COOKIE	1
+	#define ESCAPE 2
+	static int doing=NOTHING;
 
 	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
 
 	double rnd;
-	rotate(ROTATE_ALL,info->robotmaxrotate);
+
 
 	switch(info->object_find)
 	{
-	case MINE:{shoot(info->shotminenergy);break;}
+	case MINE:{break;}
 	  case ROBOT:{shoot(info->shotminenergy);break;}
 	  case WALL:{
 
-		  if(info->dist_to_object<10){
-			  brake(1);
+		  if(info->dist_to_object<7){
+			  brake(1.0);
+			  rotate(ROTATE_ALL,info->robotmaxrotate);
 		  }
 		  break;}
 	  case SHOT:{break;}
-	  case COOKIE:{break;}
+	  case COOKIE:{shoot(info->shotminenergy);break;}
 
 	}
 
@@ -75,19 +78,31 @@ void hide_escape_do_radar(robot_info * info)
  */
 void hide_escape_do_collision(robot_info * info)
 {
+	#define NOTHING	0
+	#define GET_COOKIE	1
+	#define ESCAPE 2
+	static int doing=NOTHING;
+
 	//debug("collision!!");
 	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
 
 		double rnd;
-		rotate(ROTATE_ALL,info->robotmaxrotate);
 
 		switch(info->object_find)
 		{
 		case MINE:{break;}
 		  case ROBOT:{break;}
-		  case WALL:{brake(1.0);break;}
-		  case SHOT:{accelerate(info->maxspeed);break;}
-		  case COOKIE:{break;}
+		  case WALL:{brake(1.0);doing!=NOTHING;break;}
+		  case SHOT:{
+			  	  	  if(doing!=ESCAPE){
+			  	  		 rotate(ROTATE_ALL,0);
+			  	  		 rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/4);
+			  	  		 accelerate(info->maxspeed);
+			  	  		 doing=ESCAPE;
+			  	  	  }
+			  	  	  break;
+		  	  	  }
+		  case COOKIE:{doing!=NOTHING;break;}
 
 		}
 }
