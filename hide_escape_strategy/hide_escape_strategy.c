@@ -5,9 +5,14 @@
  *      Author: angel
  */
 #include <stdlib.h>
-
+#include <time.h>
 #include "rtblib.h"
 
+
+#define NOTHING	0
+#define GET_COOKIE	1
+#define ESCAPE 2
+static int doing=NOTHING;
 
 /*
  * does noting
@@ -44,29 +49,53 @@ void hide_escape_do_info(robot_info * info)
  */
 void hide_escape_do_radar(robot_info * info)
 {
-	#define NOTHING	0
-	#define GET_COOKIE	1
-	#define ESCAPE 2
-	static int doing=NOTHING;
 
 	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
 
 	double rnd;
 
+	if((doing==ESCAPE)
+		&&(info->object_find!=WALL)
+		&&(info->object_find!=MINE)){//do nothing, continue scaping
+		return;
+	}
 
 	switch(info->object_find)
 	{
-	case MINE:{break;}
+	case MINE:{
+				if(info->dist_to_object<7){
+					shoot(info->shotminenergy);
+				}
+				rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle+PI);
+				break;
+				}
 	  case ROBOT:{shoot(info->shotminenergy);break;}
 	  case WALL:{
 
-		  if(info->dist_to_object<7){
-			  brake(1.0);
-			  rotate(ROTATE_ALL,info->robotmaxrotate);
-		  }
+				  if(info->dist_to_object<10){
+					  brake(10/info->dist_to_object);
+					  rotate(ROTATE_ALL,info->robotmaxrotate);
+				  }
+				  doing=NOTHING;
 		  break;}
 	  case SHOT:{break;}
-	  case COOKIE:{shoot(info->shotminenergy);break;}
+	  case COOKIE:{
+					  if(info->dist_to_object>12){//hit that cookie
+							  shoot(info->shotminenergy);
+					  }
+					  else{//get that cookie
+						  rotate(ROTATE_ALL,0);
+						  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
+						  if(doing!=GET_COOKIE){
+							 doing=GET_COOKIE;
+							 if(info->dist_to_object>5)
+								  accelerate(info->maxspeed);
+							 else
+								  accelerate(info->maxspeed/1.2);
+						  }
+					  }
+					  break;
+	  	  	  	  }
 
 	}
 
@@ -78,33 +107,40 @@ void hide_escape_do_radar(robot_info * info)
  */
 void hide_escape_do_collision(robot_info * info)
 {
-	#define NOTHING	0
-	#define GET_COOKIE	1
-	#define ESCAPE 2
-	static int doing=NOTHING;
+
 
 	//debug("collision!!");
 	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
 
-		double rnd;
+	double rnd;
+	static clock_t last_shoot;
+	double lapse_between_shoots;
 
-		switch(info->object_find)
-		{
-		case MINE:{break;}
-		  case ROBOT:{break;}
-		  case WALL:{brake(1.0);doing!=NOTHING;break;}
-		  case SHOT:{
-			  	  	  if(doing!=ESCAPE){
-			  	  		 rotate(ROTATE_ALL,0);
-			  	  		 rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/4);
-			  	  		 accelerate(info->maxspeed);
-			  	  		 doing=ESCAPE;
-			  	  	  }
-			  	  	  break;
-		  	  	  }
-		  case COOKIE:{doing!=NOTHING;break;}
 
-		}
+	if(doing==ESCAPE){//do nothing, continue scaping
+			return;
+	}
+
+	switch(info->object_find)
+	{
+	case MINE:{break;}
+	  case ROBOT:{break;}
+	  case WALL:{brake(1.0);doing=NOTHING;break;}
+	  case SHOT:{
+		  	  	  lapse_between_shoots=((double)clock() - last_shoot) / CLOCKS_PER_SEC;
+				  if((doing!=ESCAPE)&&(lapse_between_shoots<2)){
+					 rotate(ROTATE_ALL,0);
+					 rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/2);
+					 accelerate(info->maxspeed);
+					 doing=ESCAPE;
+					 rotate(ROTATE_ALL,PI/8);
+				  }
+				  last_shoot=clock();
+				  break;
+			  }
+	  case COOKIE:{break;}
+
+	}
 }
 
 /**

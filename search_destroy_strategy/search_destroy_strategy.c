@@ -53,7 +53,7 @@ void search_destroy_do_radar(robot_info * info)
 	static unsigned char enemy_found=0;
 	static unsigned char last_object=0;
 	static unsigned char doing=NOTHING;
-	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
+	int dir=((rand()/RAND_MAX)>0.5)? 1:-1;
 
 	double rnd;
 	if(info->robots_left>17){
@@ -153,7 +153,7 @@ void search_destroy_do_collision(robot_info * info)
 	double acceleration,robot_rotate,radar_angle,sweepleft,sweepright,shot_energy;
 	int i,count_shot;
 	double rnd;
-	int dir=(rand()/RAND_MAX>0.6)? 1:-1;
+	int dir=((rand()/RAND_MAX)>0.5)? 1:-1;
 	switch(info->object_find)
 		{
 	case ROBOT:{//lets hit that guy
@@ -197,7 +197,7 @@ void search_destroy_do_collision(robot_info * info)
 			  	  	  break;}
 		  case WALL:{//lets avoid THAT
 			  	  	rnd=rnd=(rand()/RAND_MAX)*2*PI;
-			  	  	rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rnd);
+			  	  	rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rnd*dir);
 					accelerate(info->maxspeed);
 					break;
 				  }
