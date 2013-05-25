@@ -50,6 +50,8 @@ void basic_initialize(robot_info * data_to_work)
 	data_to_work->shotminenergy=0.5;
 	data_to_work->shotspeed=10;
 	data_to_work->shootpenalty=0.075;
+	data_to_work->bullet_hits=0;
+	data_to_work->object_find=-1;
 }
 
 /**
@@ -72,12 +74,13 @@ void set_message_action(enum message_to_robot_type code, type_action *action)
  * sets the strategy strategy_actions, the strategy defines an action to do for any message that can be
  * received
  */
-void set_strategy(type_action ** strategy_actions)
+void set_strategy(type_action ** strategy_actions,robot_info * info)
 {
 	unsigned i;
 	for(i=0;i<NUM_MESSAGES_TO_ROBOT;i++){
 		actions[i]=strategy_actions[i];
 	}
+	actions[INITIALIZE](info);
 }
 
 /**
@@ -115,8 +118,7 @@ void read_robot(int sig)
    err=scanf("%s\n",buff);
    msg=name2msg_to_robot_type(buff);
    while(err!=EOF){
-	   snprintf(aux,255,"action for msg: %i\n",msg);
-	   debug(aux);
+
 		   switch(msg){
 		   case INITIALIZE:{
 			   	   	   err=scanf("%i\n",&work_info->int_msg_value);
@@ -162,6 +164,10 @@ void read_robot(int sig)
 						  err=scanf("%d\n",&work_info->object_find);
 						  err=scanf("%le\n",&work_info->object_angle);
 						  work_info->dist_to_object=0;
+						  switch(work_info->object_find){
+						  	  case SHOT:{work_info->bullet_hits++;break;}
+						  	  default:{break;}
+						  }
 						  break;
 						}
 			  case ROTATION_REACHED:{
@@ -226,6 +232,8 @@ void read_robot(int sig)
 						  }
 		   }
 		   if((msg>=0)&&(msg<NUM_MESSAGES_TO_ROBOT)){
+//			   snprintf(aux,255,"action for msg: %i\n",msg);
+//			   debug(aux);
 			   actions[msg](work_info);
 		   }
 		   snprintf(buff,255,"");

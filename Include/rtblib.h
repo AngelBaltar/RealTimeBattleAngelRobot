@@ -229,6 +229,8 @@ typedef struct
 	double energy;
 
 	int object_find;
+	unsigned bullet_hits;
+
 	double dist_to_object;
 	double object_angle;
 
@@ -344,7 +346,7 @@ enum message_to_robot_type name2msg_to_robot_type(char* msg_name);
 void read_robot(int sig);
 void set_work_info(robot_info * data_to_work);
 void set_message_action(enum message_to_robot_type code, type_action *action);
-void set_strategy(type_action ** strategy_actions);
+void set_strategy(type_action ** strategy_actions,robot_info * info);
 void basic_initialize(robot_info * data_to_work);
 
 

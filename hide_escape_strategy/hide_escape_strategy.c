@@ -18,7 +18,7 @@ static int doing=NOTHING;
  * does noting
  */
 void hide_escape_do_nothing(robot_info * info){
-	debug("hide scape doing nothing\n");
+	//debug("hide scape doing nothing\n");
 	return;
 }
 
@@ -69,31 +69,26 @@ void hide_escape_do_radar(robot_info * info)
 				rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle+PI);
 				break;
 				}
-	  case ROBOT:{shoot(info->shotminenergy);break;}
+	  case ROBOT:{ rotate(ROTATE_ALL,0);shoot(info->shotminenergy);rotate(ROTATE_ROBOT,info->robotmaxrotate);break;}
 	  case WALL:{
 
 				  if(info->dist_to_object<10){
-					  brake(10/info->dist_to_object);
+					  brake(1);
 					  rotate(ROTATE_ALL,info->robotmaxrotate);
 				  }
 				  doing=NOTHING;
 		  break;}
 	  case SHOT:{break;}
 	  case COOKIE:{
-					  if(info->dist_to_object>12){//hit that cookie
-							  shoot(info->shotminenergy);
-					  }
-					  else{//get that cookie
-						  rotate(ROTATE_ALL,0);
-						  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
-						  if(doing!=GET_COOKIE){
-							 doing=GET_COOKIE;
-							 if(info->dist_to_object>5)
-								  accelerate(info->maxspeed);
-							 else
-								  accelerate(info->maxspeed/1.2);
-						  }
-					  }
+					  //get that cookie
+					  rotate(ROTATE_ALL,0);
+					  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
+						 doing=GET_COOKIE;
+						 if(info->dist_to_object>5)
+							  accelerate(info->maxspeed);
+						 else
+							  accelerate(info->maxspeed/1.2);
+
 					  break;
 	  	  	  	  }
 
@@ -126,14 +121,13 @@ void hide_escape_do_collision(robot_info * info)
 	case MINE:{break;}
 	  case ROBOT:{break;}
 	  case WALL:{brake(1.0);doing=NOTHING;break;}
-	  case SHOT:{
+	  case SHOT:{//use time instead of clock, precision lost using sleep
 		  	  	  lapse_between_shoots=((double)clock() - last_shoot) / CLOCKS_PER_SEC;
-				  if((doing!=ESCAPE)&&(lapse_between_shoots<2)){
-					 rotate(ROTATE_ALL,0);
-					 rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,PI/2);
-					 accelerate(info->maxspeed);
-					 doing=ESCAPE;
-					 rotate(ROTATE_ALL,PI/8);
+				  if((doing!=ESCAPE)&&(lapse_between_shoots<4)){
+					  rotate(ROTATE_ALL,0);
+					  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle+PI/2);
+					  doing=ESCAPE;
+					  accelerate(info->maxspeed);
 				  }
 				  last_shoot=clock();
 				  break;

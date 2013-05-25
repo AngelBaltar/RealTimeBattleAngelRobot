@@ -13,7 +13,7 @@
  * does noting
  */
 void search_destroy_do_nothing(robot_info * info){
-	debug("search destroy doing nothing\n");
+	//debug("search destroy doing nothing\n");
 	return;
 }
 
@@ -115,7 +115,7 @@ void search_destroy_do_radar(robot_info * info)
 				  break;
 	 			 }
 	  case SHOT:{//lets avoid THAT.
-		  if((info->dist_to_object<20)&&(info->dist_to_object<10))
+		  if(info->dist_to_object>15)
 			  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,rand()*2*PI*dir);
 		  break;
 	  }
