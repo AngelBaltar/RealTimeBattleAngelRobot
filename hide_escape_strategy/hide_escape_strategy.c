@@ -73,7 +73,7 @@ void hide_escape_do_radar(robot_info * info)
 	  case WALL:{
 
 				  if(info->dist_to_object<10){
-					  brake(1);
+					  brake(0.7);
 					  rotate(ROTATE_ALL,info->robotmaxrotate);
 				  }
 				  doing=NOTHING;
@@ -123,7 +123,7 @@ void hide_escape_do_collision(robot_info * info)
 	  case WALL:{brake(1.0);doing=NOTHING;break;}
 	  case SHOT:{//use time instead of clock, precision lost using sleep
 		  	  	  lapse_between_shoots=((double)clock() - last_shoot) / CLOCKS_PER_SEC;
-				  if((doing!=ESCAPE)&&(lapse_between_shoots<4)){
+				  if((doing!=ESCAPE)&&(lapse_between_shoots<1)){
 					  rotate(ROTATE_ALL,0);
 					  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle+PI/2);
 					  doing=ESCAPE;
