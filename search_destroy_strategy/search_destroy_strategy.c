@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "rtblib.h"
+#include <math.h>
 
 
 /*
@@ -19,8 +20,9 @@ void search_destroy_do_nothing(robot_info * info){
 
 void perform_basics(robot_info * info)
 {
-	rotate_to(ROTATE_CANNON+ROTATE_RADAR,1.0,0.0);
+	rotate_to(ROTATE_CANNON+ROTATE_RADAR,fmax(info->radarmaxrotate,info->cannonmaxrotate),0);
 	sweep(ROTATE_RADAR,info->radarmaxrotate,-PI/4,PI/4);
+	accelerate(info->maxspeed);
 
 }
 
@@ -96,27 +98,27 @@ void search_destroy_do_radar(robot_info * info)
 				break;
 		}
 	  case ROBOT:{//lets hit that guy
-				  brake(1);
+		  	  	  rotate_to(ROTATE_CANNON,info->cannonmaxrotate,info->object_angle);
 				  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
-//				  if((info->energy<10) && (info->dist_to_object>15) )
-//					  break;
+				  if((info->energy<10) || (info->dist_to_object>5) )
+					  break;
+				  brake(50);
 				  Print("Die coward!");
 				  shoot(shot_energy);
 				  accelerate(info->maxspeed);
-				  perform_basics(info);
+				  rotate(ROTATE_ROBOT+ROTATE_RADAR+ROTATE_CANNON,0);
 		  	  	  break;
 				  }
 	  case WALL:{//lets avoid THAT
 
-					  if(info->dist_to_object<=10){
-						  brake(10);
+					  if((info->dist_to_object<=20) && (info->dist_to_object>0)){
+						  brake(60/info->dist_to_object);
 						  rotate(ROTATE_ROBOT+ROTATE_RADAR+ROTATE_CANNON,info->robotmaxrotate);
 						  accelerate(info->maxspeed/4);
 					  }
 				  break;
 	 			 }
 	  case SHOT:{//lets avoid THAT.
-		  	  accelerate(info->maxspeed);
 		  	  //rotate(ROTATE_ROBOT,0.1);
 		  break;
 	  }
