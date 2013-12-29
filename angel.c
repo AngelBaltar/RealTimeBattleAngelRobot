@@ -47,17 +47,18 @@ int main(int argc, char * argv[])
   set_work_info(&info);
   basic_initialize(&info);
   signal(SIGUSR1, &read_robot);
+  set_strategy(all_strategies[1],&info);
 
   for( ;!info.exit_robot ;sleep(1)){
 
 	  select_strategy_ant=select_strategy;
-
-	  select_strategy=(info.robots_left>4)*HIDE_ESCAPE
-			  	  	  +(info.robots_left<=4)*SEARCH_DESTROY;
-
-	  if(select_strategy!=select_strategy_ant){
-		  set_strategy(all_strategies[select_strategy],&info);
-	  }
+//
+//	  select_strategy=(info.robots_left>4)*HIDE_ESCAPE
+//			  	  	  +(info.robots_left<=4)*SEARCH_DESTROY;
+//
+//	  if(select_strategy!=select_strategy_ant){
+//		  set_strategy(all_strategies[select_strategy],&info);
+//	  }
   }
   return(EXIT_SUCCESS);
 }

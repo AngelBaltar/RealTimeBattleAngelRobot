@@ -18,7 +18,7 @@ static int doing=NOTHING;
  * does noting
  */
 void hide_escape_do_nothing(robot_info * info){
-	//debug("hide scape doing nothing\n");
+	debug("hide scape doing nothing\n");
 	return;
 }
 

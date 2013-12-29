@@ -6,6 +6,7 @@
  */
 
 #include "rtblib.h"
+#include <string.h>
 
 
 
@@ -80,7 +81,7 @@ void set_strategy(type_action ** strategy_actions,robot_info * info)
 	for(i=0;i<NUM_MESSAGES_TO_ROBOT;i++){
 		actions[i]=strategy_actions[i];
 	}
-	actions[INITIALIZE](info);
+	//actions[INITIALIZE](info);
 }
 
 /**
@@ -175,7 +176,21 @@ void read_robot(int sig)
 								  }
 			  case GAME_STARTS:{
 			            break;}
-			  case WARNING:{Print("ups i get a warning\n");break;}
+			  case WARNING:{
+
+				  	  	  	  err=scanf("%d\n",&i);
+				  	  	  	  err=scanf("%s\n",&aux);
+				  	  	  	  switch(i){
+								  case UNKNOWN_MESSAGE:{Print("warining unknown message");break;}
+								  case PROCESS_TIME_LOW:{Print("warining process time low");break;}
+								  case MESSAGE_SENT_IN_ILLEGAL_STATE:{Print("warining sent in illegal state");break;}
+								  case UNKNOWN_OPTION:{Print("warining unknown option");break;}
+								  case OBSOLETE_KEYWORD:{Print("warining obsolete keyword");break;}
+								  case NAME_NOT_GIVEN:{Print("warining name not given");break;}
+								  case COLOUR_NOT_GIVEN:{Print("warining colour not given");break;}
+				  	  	  	  }
+				  	  	  	  Print(aux);
+				  	  	  	  break;}
 			  case DEAD:{Print("im dead but i can kill someone form the other side\n");break;}
 			  case GAME_OPTION:{
 						int optnr;
@@ -232,11 +247,12 @@ void read_robot(int sig)
 						  }
 		   }
 		   if((msg>=0)&&(msg<NUM_MESSAGES_TO_ROBOT)){
-//			   snprintf(aux,255,"action for msg: %i\n",msg);
-//			   debug(aux);
+			   snprintf(aux,255,"action for msg: %i\n",msg);
+			   debug(aux);
 			   actions[msg](work_info);
 		   }
 		   snprintf(buff,255,"");
+		   memset(buff,0,255);
 		   err=scanf("%s\n",buff);
 		   msg=name2msg_to_robot_type(buff);
    }
