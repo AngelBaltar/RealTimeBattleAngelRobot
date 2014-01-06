@@ -21,7 +21,7 @@ void search_destroy_do_nothing(robot_info * info){
 void perform_basics(robot_info * info)
 {
 	rotate_to(ROTATE_CANNON+ROTATE_RADAR,fmax(info->radarmaxrotate,info->cannonmaxrotate),0);
-	sweep(ROTATE_RADAR,info->radarmaxrotate,-PI/4,PI/4);
+	sweep(ROTATE_RADAR,info->radarmaxrotate,-PI/2,PI/2);
 	accelerate(info->maxspeed);
 
 }
