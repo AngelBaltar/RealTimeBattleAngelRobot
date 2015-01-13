@@ -134,7 +134,7 @@ void read_robot(int sig)
 			   }
 
 			  case ENERGY:{
-						err=scanf("%le\n",&tid,&work_info->energy);
+						err=scanf("%le\n",&work_info->energy);
 						break;
 					  }
 			  case ROBOTS_LEFT:{
@@ -179,7 +179,7 @@ void read_robot(int sig)
 			  case WARNING:{
 
 				  	  	  	  err=scanf("%d\n",&i);
-				  	  	  	  err=scanf("%s\n",&aux);
+				  	  	  	  err=scanf("%s\n",aux);
 				  	  	  	  switch(i){
 								  case UNKNOWN_MESSAGE:{Print("warining unknown message");break;}
 								  case PROCESS_TIME_LOW:{Print("warining process time low");break;}
@@ -251,7 +251,7 @@ void read_robot(int sig)
 			   debug(aux);
 			   actions[msg](work_info);
 		   }
-		   snprintf(buff,255,"");
+		   //snprintf(buff,255,"");
 		   memset(buff,0,255);
 		   err=scanf("%s\n",buff);
 		   msg=name2msg_to_robot_type(buff);

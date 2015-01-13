@@ -98,11 +98,11 @@ void search_destroy_do_radar(robot_info * info)
 				break;
 		}
 	  case ROBOT:{//lets hit that guy
+		  	  	  if((info->energy<10) || (info->dist_to_object>5) )
+		  					  break;
+		  	  	  brake(50);
 		  	  	  rotate_to(ROTATE_CANNON,info->cannonmaxrotate,info->object_angle);
 				  rotate_amount(ROTATE_ROBOT,info->robotmaxrotate,info->object_angle);
-				  if((info->energy<10) || (info->dist_to_object>5) )
-					  break;
-				  brake(50);
 				  Print("Die coward!");
 				  shoot(shot_energy);
 				  accelerate(info->maxspeed);
@@ -119,7 +119,7 @@ void search_destroy_do_radar(robot_info * info)
 				  break;
 	 			 }
 	  case SHOT:{//lets avoid THAT.
-		  	  //rotate(ROTATE_ROBOT,0.1);
+		  rotate(ROTATE_ROBOT+ROTATE_RADAR+ROTATE_CANNON,info->robotmaxrotate);
 		  break;
 	  }
 	  case COOKIE:{//get it
@@ -170,19 +170,19 @@ void search_destroy_do_collision(robot_info * info)
 	dir=dir*-1;
 	switch(info->object_find)
 		{
-	case ROBOT:{//lets hit that guy
-		 	 	  brake(0.8);
-				  shoot(shot_energy);
-				  if(info->dist_to_object<6){
-					  count_shot=10;
-					  i=0;
-					  while(i++<count_shot){
-						  shoot(shot_energy);
+		 case ROBOT:{//lets hit that guy
+					  brake(0.8);
+					  shoot(shot_energy);
+					  if(info->dist_to_object<6){
+						  count_shot=10;
+						  i=0;
+						  while(i++<count_shot){
+							  shoot(shot_energy);
+						  }
+						  Print("Die coward!\n");
 					  }
-					  Print("Die coward!\n");
-				  }
-				  break;
-				 }
+					  break;
+					 }
 		  case SHOT:{
 			  		  accelerate(info->maxspeed);
 			  	  	  break;}
